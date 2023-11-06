@@ -47,9 +47,10 @@ def create_image_with_verse(verse_data):
 
 # Automate posts on Instagram
 def post_to_instagram():
-    user_name = os.getenv('INSTAGRAM_USERNAME', 'reminder_of_akh1ra')
-    password = os.getenv('INSTAGRAM_PASSWORD', 'Iownthis@1')  # Add your Instagram password here
-    caption = 'Assalamualaykum, Here is a random Quran verse.'
+    user_name = os.getenv('INSTAGRAM_USERNAME','reminder_of_akh1ra')
+    password = os.getenv('INSTAGRAM_PASSWORD','Iownthis@1')
+
+    caption = 'Assalamualaykum, Here is a random verse from the Quran.'
     png_image_path = 'random_verse.png'
     jpg_image_path = 'random_verse.jpg'
 
