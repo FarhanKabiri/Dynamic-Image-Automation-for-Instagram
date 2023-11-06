@@ -2,13 +2,12 @@ name: run QVerse.py
 
 on:
   schedule:
-    - cron: '*/30 * * * *'  # Set the schedule here (every 30 minutes in this example)
+    - cron: '*/30 * * * *'  # Set the schedule here (every 10 minutes in this example)
 
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-
       - name: checkout repo content
         uses: actions/checkout@v2 # checkout the repository content to github runner
 
@@ -21,7 +20,7 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
-         
+          
       - name: Use Instagram Credentials
         env:
           INSTAGRAM_USERNAME: ${{ secrets.INSTAGRAM_USERNAME }}
