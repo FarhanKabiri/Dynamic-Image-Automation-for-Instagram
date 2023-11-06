@@ -24,7 +24,7 @@ def create_image_with_verse(verse_data):
     ayah_text = verse_data.get('data', {}).get('text', '')
     ayah_number = verse_data.get('data', {}).get('numberInSurah', '')
 
-    font_path = "/Users/kabiri/apptest/EduTASBeginner-VariableFont_wght.ttf"  # Replace with the actual font path
+    font_path = ".github/workflows/EduTASBeginner-VariableFont_wght.ttf"
     font = ImageFont.truetype(font_path, size=30)  # Adjust the size if needed
 
     # Define text positions in the image
