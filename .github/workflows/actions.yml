@@ -1,8 +1,8 @@
-name: run main.py
+name: run QVerse.py
 
 on:
   schedule:
-    - cron: '0 0 * * 1' # At 00:00 on Monday
+    - cron: '*/10 * * * *'  # Set the schedule here (every 10 minutes in this example)
 
 jobs:
   build:
@@ -21,12 +21,13 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
-          
-      - name: execute py script # run main.py
+
+      - name: Use Instagram Credentials
         env:
-          SOME_SECRET: ${{ secrets.SOME_SECRET }}
-        run: python main.py
-          
+          INSTAGRAM_USERNAME: ${{ secrets.INSTAGRAM_USERNAME }}
+          INSTAGRAM_PASSWORD: ${{ secrets.INSTAGRAM_PASSWORD }}
+        run: python QVerse.py
+
       - name: commit files
         run: |
           git config --local user.email "action@github.com"
@@ -38,4 +39,4 @@ jobs:
         uses: ad-m/github-push-action@v0.6.0
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          branch: main 
+          branch: main
