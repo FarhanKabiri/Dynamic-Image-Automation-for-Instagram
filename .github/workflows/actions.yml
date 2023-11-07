@@ -2,7 +2,7 @@ name: Run QVerse.py
 
 on:
   schedule:
-    - cron: '*/10 * * * *'  # Set the schedule here (every 10 minutes in this example)
+    - cron: '0 0 * * *'  # This cron expression runs the workflow every day at midnight (00:00)
 
 jobs:
   build:
