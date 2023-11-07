@@ -2,7 +2,7 @@ name: run QVerse.py
 
 on:
   schedule:
-    - cron: '*/30 * * * *'  # Set the schedule here (every 30 minutes in this example)
+    - cron: '*/10 * * * *'  # Set the schedule here (every 30 minutes in this example)
 
 jobs:
   build:
@@ -37,5 +37,5 @@ jobs:
       - name: push changes
         uses: ad-m/github-push-action@v0.6.0
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
+          github_token: ${{ secrets.MY_GITHUB_TOKEN }}
           branch: main
