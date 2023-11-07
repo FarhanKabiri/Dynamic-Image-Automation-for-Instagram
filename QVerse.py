@@ -1,4 +1,4 @@
-from PIL import Image, ImageDraw, ImageFont
+import Image, ImageDraw, ImageFont
 import requests
 import random
 import textwrap
