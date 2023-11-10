@@ -1,8 +1,8 @@
-name: Run QVerse.py
+name: run QVerse.py
 
 on:
   schedule:
-    - cron: '0 0 * * *'  # This cron expression runs the workflow every day at midnight (00:00)
+    - cron: '0 0 * * *'  # Set the schedule here (once a day)
 
 jobs:
   build:
@@ -12,15 +12,18 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Setup Python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v4
         with:
           python-version: '3.9'
 
-      - name: Install Python dependencies
+      - name: Install Python packages
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
-          pip install pillow  
+          pip install pillow
 
-      - name: Execute QVerse.py
+      - name: Run Python script
         run: python QVerse.py
+        env:
+          INSTAGRAM_USERNAME: ${{ secrets.INSTAGRAM_USERNAME }}
+          INSTAGRAM_PASSWORD: ${{ secrets.INSTAGRAM_PASSWORD }}
