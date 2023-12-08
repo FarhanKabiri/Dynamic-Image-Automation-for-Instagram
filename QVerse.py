@@ -52,7 +52,7 @@ def post_to_instagram():
     user_name = os.getenv('INSTAGRAM_USERNAME')
     password = os.getenv('INSTAGRAM_PASSWORD')
 
-    caption = 'Assalamualaykum, Here is a random verse from the Quran.'
+    caption = 'Assalamualaikum, here is a random verse from the Quran. \n#quran #quranverses #quranquotes'
     png_image_path = 'random_verse.png'
     jpg_image_path = 'random_verse.jpg'
 
