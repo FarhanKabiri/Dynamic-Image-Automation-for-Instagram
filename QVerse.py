@@ -6,6 +6,11 @@ import random
 import textwrap
 from instagrapi import Client
 import os
+from instagrapi.types import Media as OriginalMedia
+from typing import Union
+
+class Media(OriginalMedia):
+    pk: Union[str, int]
 
 # Function to get a random verse from Quran API
 def get_random_verse(edition):
