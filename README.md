@@ -1,1 +1,1 @@
-@reminder_of_akh1ra on Instagram to see the result.
+Live demo: https://www.instagram.com/reminder_of_akh1ra/
