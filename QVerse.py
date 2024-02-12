@@ -26,6 +26,15 @@ def get_random_verse(edition):
 def create_image_with_verse(verse_data):
     img = Image.new('RGB', (800, 600), 'white')
     draw = ImageDraw.Draw(img)
+    
+    # Make image gradient 
+    gradient = [(i, i, i) for i in range(100)]
+    gradient_img = Image.new('RGB', (1, len(gradient)), color=0)
+    gradient_img.putdata(gradient)
+    gradient_img = gradient_img.resize((800, 600))
+    
+    img.paste(gradient_img(0,0))
+    
 
     surah_name = verse_data.get('data', {}).get('surah', {}).get('englishName', '')
     ayah_text = verse_data.get('data', {}).get('text', '')
@@ -34,7 +43,7 @@ def create_image_with_verse(verse_data):
     font_path = "fonts/Roboto-Regular.ttf"
     font = ImageFont.truetype(font_path, size=30)  # Adjust the size if needed
 
-    # Define text positions in the image
+    # Positions in the image
     surah_position = (50, 50)
     ayah_position = (50, 100)
 
@@ -43,12 +52,12 @@ def create_image_with_verse(verse_data):
     ayah_lines = textwrap.wrap(ayah_text, width=max_line_length)
 
     # Adding it to an image
-    draw.text(surah_position, f'Surah {surah_name}', font=font, fill='black')
+    draw.text(surah_position, f'Surah {surah_name}', font=font, fill='white')
     for i, line in enumerate(ayah_lines):
         if i == 0:
-            draw.text((ayah_position[0], ayah_position[1] + i*35), f'Ayah {ayah_number}: {line}', font=font, fill='black')
+            draw.text((ayah_position[0], ayah_position[1] + i*35), f'Ayah {ayah_number}: {line}', font=font, fill='white')
         else:
-            draw.text((ayah_position[0], ayah_position[1] + i*35), line, font=font, fill='black')
+            draw.text((ayah_position[0], ayah_position[1] + i*35), line, font=font, fill='white')
 
     img.save("random_verse.png")
 
@@ -69,7 +78,7 @@ def post_to_instagram():
     client.login(user_name, password)
     client.photo_upload(jpg_image_path, caption)
 
-# Uncomment the following line to run the functions
+
 verse_data = get_random_verse("en.sahih")
 create_image_with_verse(verse_data)
 post_to_instagram()
