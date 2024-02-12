@@ -33,7 +33,7 @@ def create_image_with_verse(verse_data):
     gradient_img.putdata(gradient)
     gradient_img = gradient_img.resize((800, 600))
     
-    img.paste(gradient_img(0,0))
+    img.paste(gradient_img,(0,0))
     
 
     surah_name = verse_data.get('data', {}).get('surah', {}).get('englishName', '')
