@@ -24,31 +24,25 @@ def get_random_verse(edition):
 
 # Function to create an image with the verse
 def create_image_with_verse(verse_data):
-    img = Image.new('RGB', (800, 600), 'white')
+    color_picker = (70, 70, 70)
+    img = Image.new('RGB', (800, 600), color=color_picker)
     draw = ImageDraw.Draw(img)
-    
-    # Make image gradient 
-    gradient = [(i, i, i) for i in range(100)]
-    gradient_img = Image.new('RGB', (1, len(gradient)), color=0)
-    gradient_img.putdata(gradient)
-    gradient_img = gradient_img.resize((800, 600))
-    
-    img.paste(gradient_img,(0,0))
+
     
 
     surah_name = verse_data.get('data', {}).get('surah', {}).get('englishName', '')
     ayah_text = verse_data.get('data', {}).get('text', '')
     ayah_number = verse_data.get('data', {}).get('numberInSurah', '')
 
-    font_path = "fonts/Roboto-Regular.ttf"
+    font_path = "fonts/Neuton-Regular.ttf"
     font = ImageFont.truetype(font_path, size=30)  # Adjust the size if needed
 
     # Positions in the image
-    surah_position = (50, 50)
-    ayah_position = (50, 100)
+    surah_position = (300, 50)
+    ayah_position = (80, 100)
 
     # Multiple lines
-    max_line_length = 40
+    max_line_length = 50
     ayah_lines = textwrap.wrap(ayah_text, width=max_line_length)
 
     # Adding it to an image
