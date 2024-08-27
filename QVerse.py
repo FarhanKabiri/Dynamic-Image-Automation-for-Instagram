@@ -24,7 +24,7 @@ def get_random_verse(edition):
 
 # Function to create an image with the verse
 def create_image_with_verse(verse_data):
-    color_picker = (10, 50, 40)
+    color_picker = (25, 175, 209)
     img = Image.new('RGB', (800, 600), color=color_picker)
     draw = ImageDraw.Draw(img)
 
