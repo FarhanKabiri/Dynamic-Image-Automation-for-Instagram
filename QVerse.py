@@ -1,8 +1,7 @@
-from PIL import Image
-from PIL import ImageFont
-from PIL import ImageDraw 
-import requests
+import time
 import random
+from PIL import Image, ImageFont, ImageDraw
+import requests
 import textwrap
 from instagrapi import Client
 import os
@@ -11,6 +10,11 @@ from typing import Union
 
 class Media(OriginalMedia):
     pk: Union[str, int]
+
+# Add a random delay to avoid detection
+random_delay = random.randint(0, 3600)  # Delay between 0 and 3600 seconds (1 hour)
+print(f"Delaying execution for {random_delay} seconds...")
+time.sleep(random_delay)
 
 # Function to get a random verse from Quran API
 def get_random_verse(edition):
@@ -28,13 +32,11 @@ def create_image_with_verse(verse_data):
     img = Image.new('RGB', (800, 600), color=color_picker)
     draw = ImageDraw.Draw(img)
 
-    
-
     surah_name = verse_data.get('data', {}).get('surah', {}).get('englishName', '')
     ayah_text = verse_data.get('data', {}).get('text', '')
     ayah_number = verse_data.get('data', {}).get('numberInSurah', '')
 
-    font_path = "fonts/Neuton-Regular.ttf"
+    font_path = "fonts/EduTASBeginner-VariableFont_wght.ttf"
     font = ImageFont.truetype(font_path, size=30)  # Adjust the size if needed
 
     # Positions in the image
@@ -71,7 +73,6 @@ def post_to_instagram():
     client = Client()
     client.login(user_name, password)
     client.photo_upload(jpg_image_path, caption)
-
 
 verse_data = get_random_verse("en.sahih")
 create_image_with_verse(verse_data)
