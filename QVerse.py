@@ -11,10 +11,6 @@ from typing import Union
 class Media(OriginalMedia):
     pk: Union[str, int]
 
-# Add a random delay to avoid detection
-random_delay = random.randint(0, 3600)  # Delay between 0 and 3600 seconds (1 hour)
-print(f"Delaying execution for {random_delay} seconds...")
-time.sleep(random_delay)
 
 # Function to get a random verse from Quran API
 def get_random_verse(edition):
