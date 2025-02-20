@@ -33,7 +33,13 @@ def create_image_with_verse(verse_data):
     ayah_number = verse_data.get('data', {}).get('numberInSurah', '')
 
     font_path = "fonts/EduTASBeginner-VariableFont_wght.ttf"
-    font = ImageFont.truetype(font_path, size=30)  # Adjust the size if needed
+
+    # Check if font file exists
+    if not os.path.exists(font_path):
+        print("Error: Font file not found. Using default font.")
+        font = ImageFont.load_default()
+    else:
+        font = ImageFont.truetype(font_path, size=30)
 
     # Positions in the image
     surah_position = (300, 50)
@@ -63,13 +69,22 @@ def post_to_instagram():
     jpg_image_path = 'random_verse.jpg'
 
     # PNG to JPEG
-    img = Image.open(png_image_path)
-    img.convert("RGB").save(jpg_image_path, "JPEG")
+    if os.path.exists(png_image_path):
+        img = Image.open(png_image_path)
+        img.convert("RGB").save(jpg_image_path, "JPEG")
+    else:
+        print("Error: Image file not found! Exiting script.")
+        return
 
     client = Client()
     client.login(user_name, password)
     client.photo_upload(jpg_image_path, caption)
 
+# Run the script
 verse_data = get_random_verse("en.sahih")
-create_image_with_verse(verse_data)
-post_to_instagram()
+
+if verse_data:
+    create_image_with_verse(verse_data)
+    post_to_instagram()
+else:
+    print("Error: Failed to retrieve verse data.")
