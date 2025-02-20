@@ -1,29 +1,30 @@
-name: Run QVerse.py with Random Time
+name: Run QVerse.py with Random Delay
 
 on:
-  workflow_dispatch:  # Allows manual triggering
   schedule:
-    - cron: '0 0 * * *'  # Default placeholder schedule (runs daily)
+    - cron: '0 0 * * *'  # Runs daily at midnight
 
 jobs:
-  set-random-time:
+  run-random-time:
     runs-on: ubuntu-latest
     steps:
-      - name: Generate Random Time
-        id: random_time
+      - name: Generate Random Time Delay
+        id: random_delay
         run: |
-          hour=$(shuf -i 0-23 -n 1)   # Random hour between 0-23
-          minute=$(shuf -i 0-59 -n 1) # Random minute between 0-59
-          echo "hour=${hour}" >> $GITHUB_ENV
-          echo "minute=${minute}" >> $GITHUB_ENV
-          echo "Generated Random Time: ${hour}:${minute}"
+          hour=$(shuf -i 0-23 -n 1)   # Random hour (0-23)
+          minute=$(shuf -i 0-59 -n 1) # Random minute (0-59)
+          seconds_until_run=$(( (hour * 3600) + (minute * 60) ))
+          echo "Waiting for $seconds_until_run seconds until execution."
+          echo "SECONDS_UNTIL_RUN=$seconds_until_run" >> $GITHUB_ENV
 
-  build:
-    runs-on: ubuntu-latest
-    needs: set-random-time
-    steps:
+      - name: Sleep Until Random Time
+        run: sleep $SECONDS_UNTIL_RUN
+
       - name: Checkout repo content
         uses: actions/checkout@v2
+
+      - name: Install System Dependencies
+        run: sudo apt-get update && sudo apt-get install -y libjpeg-dev zlib1g-dev fontconfig
 
       - name: Setup Python
         uses: actions/setup-python@v2
@@ -41,12 +42,3 @@ jobs:
         env:
           INSTAGRAM_USERNAME: ${{ secrets.INSTAGRAM_USERNAME }}
           INSTAGRAM_PASSWORD: ${{ secrets.INSTAGRAM_PASSWORD }}
-
-  reschedule:
-    runs-on: ubuntu-latest
-    needs: [set-random-time, build]
-    steps:
-      - name: Update Workflow Schedule
-        run: |
-          echo "Updating the workflow to run daily at ${hour}:${minute}."
-        # This step would require committing the updated workflow file if automation is supported.
