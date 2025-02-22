@@ -1,25 +1,13 @@
-name: Run QVerse.py with Random Delay
+name: Run QVerse.py Daily
 
 on:
   schedule:
-    - cron: '0 0 * * *'  # Runs daily at midnight
+    - cron: '0 8 * * *'  # Runs daily at 8 AM UTC
 
 jobs:
-  run-random-time:
+  run-fixed-time:
     runs-on: ubuntu-latest
     steps:
-      - name: Generate Random Time Delay
-        id: random_delay
-        run: |
-          hour=$(shuf -i 0-23 -n 1)   # Random hour (0-23)
-          minute=$(shuf -i 0-59 -n 1) # Random minute (0-59)
-          seconds_until_run=$(( (hour * 3600) + (minute * 60) ))
-          echo "Waiting for $seconds_until_run seconds until execution."
-          echo "SECONDS_UNTIL_RUN=$seconds_until_run" >> $GITHUB_ENV
-
-      - name: Sleep Until Random Time
-        run: sleep $SECONDS_UNTIL_RUN
-
       - name: Checkout repo content
         uses: actions/checkout@v2
 
