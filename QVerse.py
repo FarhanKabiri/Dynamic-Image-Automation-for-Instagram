@@ -11,7 +11,6 @@ from typing import Union
 class Media(OriginalMedia):
     pk: Union[str, int]
 
-
 # Function to get a random verse from Quran API
 def get_random_verse(edition):
     reference = random.randint(1, 6236)
@@ -24,40 +23,51 @@ def get_random_verse(edition):
 
 # Function to create an image with the verse
 def create_image_with_verse(verse_data):
-    color_picker = (1, 31, 102)
-    img = Image.new('RGB', (800, 600), color=color_picker)
+    img_width, img_height = 1080, 1080
+    img = Image.new('RGB', (img_width, img_height), color=(0, 0, 0))
     draw = ImageDraw.Draw(img)
 
+    # Extract data
     surah_name = verse_data.get('data', {}).get('surah', {}).get('englishName', '')
     ayah_text = verse_data.get('data', {}).get('text', '')
     ayah_number = verse_data.get('data', {}).get('numberInSurah', '')
 
-    font_path = "fonts/EduTASBeginner-VariableFont_wght.ttf"
-
-    # Check if font file exists
-    if not os.path.exists(font_path):
-        print("Error: Font file not found. Using default font.")
-        font = ImageFont.load_default()
+    # Load fonts
+    title_font_path = "fonts/Neuton-Regular.ttf"
+    body_font_path = "fonts/YanoneKaffeesatz-Regular.ttf"
+    if not os.path.exists(title_font_path) or not os.path.exists(body_font_path):
+        print("Font not found. Using default font.")
+        font_title = ImageFont.load_default()
+        font_body = ImageFont.load_default()
     else:
-        font = ImageFont.truetype(font_path, size=30)
+        font_title = ImageFont.truetype(title_font_path, size=70)
+        font_body = ImageFont.truetype(body_font_path, size=40)
 
-    # Positions in the image
-    surah_position = (300, 50)
-    ayah_position = (80, 100)
+    # Title: Surah Name + Ayah Number
+    title_text = f"Surah {surah_name} [Ayah {ayah_number}]"
+    title_bbox = draw.textbbox((0, 0), title_text, font=font_title)
+    title_w = title_bbox[2] - title_bbox[0]
+    title_h = title_bbox[3] - title_bbox[1]
+    title_position = ((img_width - title_w) // 2, 100)
+    draw.text(title_position, title_text, font=font_title, fill='white')
 
-    # Multiple lines
-    max_line_length = 50
+    # Ayah Text (wrapped + centered)
+    max_line_length = 65
     ayah_lines = textwrap.wrap(ayah_text, width=max_line_length)
+    line_spacing = 8
+    starting_y = title_position[1] + title_h + 60
 
-    # Adding it to an image
-    draw.text(surah_position, f'Surah {surah_name}', font=font, fill='white')
     for i, line in enumerate(ayah_lines):
-        if i == 0:
-            draw.text((ayah_position[0], ayah_position[1] + i*35), f'Ayah {ayah_number}: {line}', font=font, fill='white')
-        else:
-            draw.text((ayah_position[0], ayah_position[1] + i*35), line, font=font, fill='white')
+        line_bbox = draw.textbbox((0, 0), line, font=font_body)
+        line_w = line_bbox[2] - line_bbox[0]
+        line_h = line_bbox[3] - line_bbox[1]
+        line_x = (img_width - line_w) // 2
+        line_y = starting_y + i * (line_h + line_spacing)
+        draw.text((line_x, line_y), line, font=font_body, fill='white')
 
+    # Save the image
     img.save("random_verse.png")
+   # img.show()  # Local preview
 
 # Automate posts on Instagram
 def post_to_instagram():
@@ -68,7 +78,7 @@ def post_to_instagram():
     png_image_path = 'random_verse.png'
     jpg_image_path = 'random_verse.jpg'
 
-    # PNG to JPEG
+    # Convert PNG to JPEG
     if os.path.exists(png_image_path):
         img = Image.open(png_image_path)
         img.convert("RGB").save(jpg_image_path, "JPEG")
@@ -76,6 +86,7 @@ def post_to_instagram():
         print("Error: Image file not found! Exiting script.")
         return
 
+    # Login and post
     client = Client()
     client.login(user_name, password)
     client.photo_upload(jpg_image_path, caption)
