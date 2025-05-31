@@ -56,7 +56,7 @@ def create_image_with_verse(verse_data):
     ayah_lines = textwrap.wrap(ayah_text, width=max_line_length)
     starting_y = title_position[1] + title_h + 60
     ascent, descent = font_body.getmetrics()
-    line_height = ascent, descent + 10 # tweak for extra padding on body text
+    line_height = ascent + descent + 10 # tweak for extra padding on body text
 
     for i, line in enumerate(ayah_lines):
         line_w = font_body.getbbox(line)[2] - font_body.getbbox(line)[0]
