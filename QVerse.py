@@ -23,8 +23,14 @@ def get_random_verse(edition):
 
 # Function to create an image with the verse
 def create_image_with_verse(verse_data):
+    
+    # colors
+    backgroundColor = (10,20,40)
+    titleColor = (229, 200, 50)
+    bodytextColor = (255, 255, 255)
+    
     img_width, img_height = 1080, 1080
-    img = Image.new('RGB', (img_width, img_height), color=(0, 0, 0))
+    img = Image.new('RGB', (img_width, img_height), color=backgroundColor)
     draw = ImageDraw.Draw(img)
 
     # Extract data
@@ -49,7 +55,7 @@ def create_image_with_verse(verse_data):
     title_w = title_bbox[2] - title_bbox[0]
     title_h = title_bbox[3] - title_bbox[1]
     title_position = ((img_width - title_w) // 2, 100)
-    draw.text(title_position, title_text, font=font_title, fill='white')
+    draw.text(title_position, title_text, font=font_title, fill=titleColor)
 
     # Ayah Text (wrapped + centered)
     max_line_length = 70
