@@ -15,17 +15,21 @@ def get_random_verse(edition):
     reference = random.randint(1, 6236)
     url = f'https://api.alquran.cloud/v1/ayah/{reference}/{edition}'
 
-    try:
-        response = requests.get(url, timeout=10)
-        if response.status_code == 200:
-            return response.json()
-        else:
-            print("API error:", response.status_code)
-            return None
-    except Exception as e:
-        print("Request failed:", str(e))
-        return None
+    for attempt in range(3):
+        try:
+            print(f"Attempt {attempt+1}: Fetching verse...")
+            response = requests.get(url, timeout=10)
 
+            if response.status_code == 200:
+                return response.json()
+            else:
+                print("API error:", response.status_code)
+
+        except Exception as e:
+            print("Request failed:", str(e))
+            time.sleep(2)
+
+    return None
 
 # Function to create an image with the verse
 def create_image_with_verse(verse_data):
