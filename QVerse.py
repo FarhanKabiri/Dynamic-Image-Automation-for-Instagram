@@ -6,32 +6,35 @@ import textwrap
 from instagrapi import Client
 import os
 from dotenv import load_dotenv
-from instagrapi.types import Media as OriginalMedia
-from typing import Union
 
 load_dotenv()
 
-class Media(OriginalMedia):
-    pk: Union[str, int]
 
 # Function to get a random verse from Quran API
 def get_random_verse(edition):
     reference = random.randint(1, 6236)
     url = f'https://api.alquran.cloud/v1/ayah/{reference}/{edition}'
-    response = requests.get(url)
-    if response.status_code == 200:
-        return response.json()
-    else:
+
+    try:
+        response = requests.get(url, timeout=10)
+        if response.status_code == 200:
+            return response.json()
+        else:
+            print("API error:", response.status_code)
+            return None
+    except Exception as e:
+        print("Request failed:", str(e))
         return None
+
 
 # Function to create an image with the verse
 def create_image_with_verse(verse_data):
-    
+    print("Creating image...")
+
     # colors
-    backgroundColor = (10,20,40)
+    backgroundColor = (10, 20, 40)
     titleColor = (229, 200, 50)
-    bodytextColor = (255, 255, 255)
-    
+
     img_width, img_height = 1080, 1080
     img = Image.new('RGB', (img_width, img_height), color=backgroundColor)
     draw = ImageDraw.Draw(img)
@@ -44,6 +47,7 @@ def create_image_with_verse(verse_data):
     # Load fonts
     title_font_path = "fonts/Neuton-Regular.ttf"
     body_font_path = "fonts/YanoneKaffeesatz-Regular.ttf"
+
     if not os.path.exists(title_font_path) or not os.path.exists(body_font_path):
         print("Font not found. Using default font.")
         font_title = ImageFont.load_default()
@@ -52,7 +56,7 @@ def create_image_with_verse(verse_data):
         font_title = ImageFont.truetype(title_font_path, size=70)
         font_body = ImageFont.truetype(body_font_path, size=40)
 
-    # Title: Surah Name + Ayah Number
+    # Title
     title_text = f"Surah {surah_name} [Ayah {ayah_number}]"
     title_bbox = draw.textbbox((0, 0), title_text, font=font_title)
     title_w = title_bbox[2] - title_bbox[0]
@@ -60,12 +64,13 @@ def create_image_with_verse(verse_data):
     title_position = ((img_width - title_w) // 2, 100)
     draw.text(title_position, title_text, font=font_title, fill=titleColor)
 
-    # Ayah Text (wrapped + centered)
+    # Body text
     max_line_length = 70
     ayah_lines = textwrap.wrap(ayah_text, width=max_line_length)
     starting_y = title_position[1] + title_h + 60
+
     ascent, descent = font_body.getmetrics()
-    line_height = ascent + descent + 10 # tweak for extra padding on body text
+    line_height = ascent + descent + 10
 
     for i, line in enumerate(ayah_lines):
         line_w = font_body.getbbox(line)[2] - font_body.getbbox(line)[0]
@@ -73,38 +78,58 @@ def create_image_with_verse(verse_data):
         line_y = starting_y + i * line_height
         draw.text((line_x, line_y), line, font=font_body, fill='white')
 
-
-    # Save the image
     img.save("random_verse.png")
-   # img.show()  # Local preview
+    print("Image saved.")
+
 
 # Automate posts on Instagram
 def post_to_instagram():
+    print("Logging into Instagram...")
+
     user_name = os.getenv('INSTAGRAM_USERNAME')
     password = os.getenv('INSTAGRAM_PASSWORD')
 
-    caption = 'Assalamualaikum, here is a random verse from the Quran. \n#quran #quranverses #quranquotes'
+    if not user_name or not password:
+        print("Missing Instagram credentials")
+        return
+
+    caption = 'Assalamualaikum, here is a random verse from the Quran.\n#quran #quranverses #quranquotes'
     png_image_path = 'random_verse.png'
     jpg_image_path = 'random_verse.jpg'
 
-    # Convert PNG to JPEG
-    if os.path.exists(png_image_path):
-        img = Image.open(png_image_path)
-        img.convert("RGB").save(jpg_image_path, "JPEG")
-    else:
-        print("Error: Image file not found! Exiting script.")
+    if not os.path.exists(png_image_path):
+        print("Image not found.")
         return
 
-    # Login and post
-    client = Client()
-    client.login(user_name, password)
-    client.photo_upload(jpg_image_path, caption)
+    img = Image.open(png_image_path)
+    img.convert("RGB").save(jpg_image_path, "JPEG")
 
-# Run the script
-verse_data = get_random_verse("en.sahih")
+    try:
+        client = Client()
+        client.login(user_name, password)
+        print("Logged in successfully.")
 
-if verse_data:
+        client.photo_upload(jpg_image_path, caption)
+        print("Posted to Instagram.")
+
+    except Exception as e:
+        print("Instagram error:", str(e))
+
+
+def main():
+    print("Starting script...")
+
+    verse_data = get_random_verse("en.sahih")
+
+    if not verse_data:
+        print("Failed to fetch verse.")
+        return
+
     create_image_with_verse(verse_data)
     post_to_instagram()
-else:
-    print("Error: Failed to retrieve verse data.")
+
+    print("Done.")
+
+
+if __name__ == "__main__":
+    main()
