@@ -1,16 +1,22 @@
 import time
 import random
-from PIL import Image, ImageFont, ImageDraw
 import requests
 import textwrap
-from instagrapi import Client
 import os
+import urllib3.util.connection as utils # ADDED
+from PIL import Image, ImageFont, ImageDraw
+from instagrapi import Client
 from dotenv import load_dotenv
+
+# --- FIX: Force IPv4 for DigitalOcean ---
+def allowed_gai_family():
+    return utils.AF_INET
+
+utils.allowed_gai_family = allowed_gai_family
+# ----------------------------------------
 
 load_dotenv()
 
-
-# Function to get a random verse from Quran API
 def get_random_verse(edition):
     reference = random.randint(1, 6236)
     url = f'https://api.alquran.cloud/v1/ayah/{reference}/{edition}'
@@ -18,24 +24,22 @@ def get_random_verse(edition):
     for attempt in range(3):
         try:
             print(f"Attempt {attempt+1}: Fetching verse...")
-            response = requests.get(url, timeout=10)
+            # Increased timeout slightly for server latency
+            response = requests.get(url, timeout=15) 
 
             if response.status_code == 200:
                 return response.json()
             else:
-                print("API error:", response.status_code)
+                print(f"API error: {response.status_code}")
 
         except Exception as e:
-            print("Request failed:", str(e))
+            print(f"Request failed: {e}")
             time.sleep(2)
 
     return None
 
-# Function to create an image with the verse
 def create_image_with_verse(verse_data):
     print("Creating image...")
-
-    # colors
     backgroundColor = (10, 20, 40)
     titleColor = (229, 200, 50)
 
@@ -43,12 +47,10 @@ def create_image_with_verse(verse_data):
     img = Image.new('RGB', (img_width, img_height), color=backgroundColor)
     draw = ImageDraw.Draw(img)
 
-    # Extract data
     surah_name = verse_data.get('data', {}).get('surah', {}).get('englishName', '')
     ayah_text = verse_data.get('data', {}).get('text', '')
     ayah_number = verse_data.get('data', {}).get('numberInSurah', '')
 
-    # Load fonts
     title_font_path = "fonts/Neuton-Regular.ttf"
     body_font_path = "fonts/YanoneKaffeesatz-Regular.ttf"
 
@@ -60,7 +62,6 @@ def create_image_with_verse(verse_data):
         font_title = ImageFont.truetype(title_font_path, size=70)
         font_body = ImageFont.truetype(body_font_path, size=40)
 
-    # Title
     title_text = f"Surah {surah_name} [Ayah {ayah_number}]"
     title_bbox = draw.textbbox((0, 0), title_text, font=font_title)
     title_w = title_bbox[2] - title_bbox[0]
@@ -68,7 +69,6 @@ def create_image_with_verse(verse_data):
     title_position = ((img_width - title_w) // 2, 100)
     draw.text(title_position, title_text, font=font_title, fill=titleColor)
 
-    # Body text
     max_line_length = 70
     ayah_lines = textwrap.wrap(ayah_text, width=max_line_length)
     starting_y = title_position[1] + title_h + 60
@@ -77,7 +77,8 @@ def create_image_with_verse(verse_data):
     line_height = ascent + descent + 10
 
     for i, line in enumerate(ayah_lines):
-        line_w = font_body.getbbox(line)[2] - font_body.getbbox(line)[0]
+        line_bbox = font_body.getbbox(line)
+        line_w = line_bbox[2] - line_bbox[0]
         line_x = (img_width - line_w) // 2
         line_y = starting_y + i * line_height
         draw.text((line_x, line_y), line, font=font_body, fill='white')
@@ -85,11 +86,8 @@ def create_image_with_verse(verse_data):
     img.save("random_verse.png")
     print("Image saved.")
 
-
-# Automate posts on Instagram
 def post_to_instagram():
     print("Logging into Instagram...")
-
     user_name = os.getenv('INSTAGRAM_USERNAME')
     password = os.getenv('INSTAGRAM_PASSWORD')
 
@@ -110,6 +108,7 @@ def post_to_instagram():
 
     try:
         client = Client()
+        # On DigitalOcean, you might need to handle 2FA or suspicious login challenges
         client.login(user_name, password)
         print("Logged in successfully.")
 
@@ -117,12 +116,10 @@ def post_to_instagram():
         print("Posted to Instagram.")
 
     except Exception as e:
-        print("Instagram error:", str(e))
-
+        print(f"Instagram error: {e}")
 
 def main():
     print("Starting script...")
-
     verse_data = get_random_verse("en.sahih")
 
     if not verse_data:
@@ -131,9 +128,7 @@ def main():
 
     create_image_with_verse(verse_data)
     post_to_instagram()
-
     print("Done.")
-
 
 if __name__ == "__main__":
     main()
