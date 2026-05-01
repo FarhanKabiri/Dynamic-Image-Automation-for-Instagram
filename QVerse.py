@@ -5,8 +5,11 @@ import requests
 import textwrap
 from instagrapi import Client
 import os
+from dotenv import load_dotenv
 from instagrapi.types import Media as OriginalMedia
 from typing import Union
+
+load_dotenv()
 
 class Media(OriginalMedia):
     pk: Union[str, int]
@@ -14,7 +17,7 @@ class Media(OriginalMedia):
 # Function to get a random verse from Quran API
 def get_random_verse(edition):
     reference = random.randint(1, 6236)
-    url = f'http://api.alquran.cloud/v1/ayah/{reference}/{edition}'
+    url = f'https://api.alquran.cloud/v1/ayah/{reference}/{edition}'
     response = requests.get(url)
     if response.status_code == 200:
         return response.json()
