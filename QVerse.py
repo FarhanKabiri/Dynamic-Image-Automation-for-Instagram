@@ -26,8 +26,14 @@ def get_random_verse(edition):
 
 # Function to create an image with the verse
 def create_image_with_verse(verse_data):
+    
+    # colors
+    backgroundColor = (10,20,40)
+    titleColor = (229, 200, 50)
+    bodytextColor = (255, 255, 255)
+    
     img_width, img_height = 1080, 1080
-    img = Image.new('RGB', (img_width, img_height), color=(0, 0, 0))
+    img = Image.new('RGB', (img_width, img_height), color=backgroundColor)
     draw = ImageDraw.Draw(img)
 
     # Extract data
@@ -52,21 +58,21 @@ def create_image_with_verse(verse_data):
     title_w = title_bbox[2] - title_bbox[0]
     title_h = title_bbox[3] - title_bbox[1]
     title_position = ((img_width - title_w) // 2, 100)
-    draw.text(title_position, title_text, font=font_title, fill='white')
+    draw.text(title_position, title_text, font=font_title, fill=titleColor)
 
     # Ayah Text (wrapped + centered)
-    max_line_length = 65
+    max_line_length = 70
     ayah_lines = textwrap.wrap(ayah_text, width=max_line_length)
-    line_spacing = 8
     starting_y = title_position[1] + title_h + 60
+    ascent, descent = font_body.getmetrics()
+    line_height = ascent + descent + 10 # tweak for extra padding on body text
 
     for i, line in enumerate(ayah_lines):
-        line_bbox = draw.textbbox((0, 0), line, font=font_body)
-        line_w = line_bbox[2] - line_bbox[0]
-        line_h = line_bbox[3] - line_bbox[1]
+        line_w = font_body.getbbox(line)[2] - font_body.getbbox(line)[0]
         line_x = (img_width - line_w) // 2
-        line_y = starting_y + i * (line_h + line_spacing)
+        line_y = starting_y + i * line_height
         draw.text((line_x, line_y), line, font=font_body, fill='white')
+
 
     # Save the image
     img.save("random_verse.png")
