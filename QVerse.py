@@ -8,13 +8,15 @@ from PIL import Image, ImageFont, ImageDraw
 from instagrapi import Client
 from dotenv import load_dotenv
 
+import socket # Added this
+import urllib3.util.connection as utils
+
 # --- FIX: Force IPv4 for DigitalOcean ---
 def allowed_gai_family():
-    return utils.AF_INET
+    return socket.AF_INET # Use socket.AF_INET here
 
 utils.allowed_gai_family = allowed_gai_family
 # ----------------------------------------
-
 load_dotenv()
 
 def get_random_verse(edition):
